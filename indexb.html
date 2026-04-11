@@ -1,0 +1,2094 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Música Central Pro | Premium Audio Experience</title>
+    
+    <!-- PRECONNECT para Priorização de Recursos -->
+    <link rel="preconnect" href="https://api.deezer.com">
+    <link rel="preconnect" href="https://api.allorigins.win">
+    <link rel="preconnect" href="https://api.rss2json.com">
+    <link rel="preconnect" href="https://generativelanguage.googleapis.com">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    
+    <!-- Tipografia Premium -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* ==========================================================================
+           1. VARIÁVEIS E TEMAS (THEME SYSTEM)
+           ========================================================================== */
+        :root {
+            /* Tema Claro (Default) */
+            --bg-color: #ffffff;
+            --text-main: #0a0a0a;
+            --text-muted: #666666;
+            --accent-color: #6200ee;
+            --accent-hover: #4b00d1;
+            --accent-soft: #f3ebff;
+            --border-color: #e5e5e5;
+            --card-bg: #fcfcfc;
+            --sidebar-bg: #fafafa;
+            --glass-bg: rgba(255, 255, 255, 0.85);
+            --shadow-sm: 0 4px 12px rgba(0,0,0,0.03);
+            --shadow-lg: 0 20px 60px rgba(0,0,0,0.08);
+            --radius-md: 12px;
+            --radius-lg: 24px;
+            --danger-color: #ff3b30;
+            --success-color: #34c759;
+            --player-height: 100px;
+        }
+
+        [data-theme="dark"] {
+            /* Tema Escuro */
+            --bg-color: #050505;
+            --text-main: #ffffff;
+            --text-muted: #a0a0a0;
+            --accent-color: #bb86fc;
+            --accent-hover: #9965f4;
+            --accent-soft: #1a1a2e;
+            --border-color: #222222;
+            --card-bg: #111111;
+            --sidebar-bg: #0a0a0a;
+            --glass-bg: rgba(10, 10, 10, 0.85);
+            --shadow-sm: 0 4px 12px rgba(0,0,0,0.5);
+            --shadow-lg: 0 20px 60px rgba(0,0,0,0.8);
+        }
+
+        /* ==========================================================================
+           2. RESET E ESTILOS GLOBAIS
+           ========================================================================== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            outline: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
+            transition: background-color 0.4s ease, color 0.4s ease;
+            padding-bottom: calc(var(--player-height) + 40px); /* Espaço para o player */
+        }
+
+        .container {
+            max-width: 1440px;
+            margin: 0 auto;
+            padding: 0 30px;
+        }
+
+        h1, h2, h3, .serif-font { font-family: 'Playfair Display', serif; }
+        .mono-font { font-family: 'JetBrains Mono', monospace; }
+
+        /* Animações Globais */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+        @keyframes pulse { 50% { opacity: 0.5; } }
+
+        /* ==========================================================================
+           3. CABEÇALHO E NAVEGAÇÃO
+           ========================================================================== */
+        header {
+            padding: 60px 0 30px;
+            text-align: center;
+            position: relative;
+        }
+
+        .theme-toggle-btn {
+            position: absolute;
+            top: 40px;
+            right: 0;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            padding: 10px 20px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: 0.3s;
+            z-index: 100;
+        }
+        .theme-toggle-btn:hover { border-color: var(--accent-color); transform: translateY(-2px); }
+
+        .logo-title {
+            font-size: clamp(3rem, 8vw, 6rem);
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: -2px;
+            line-height: 1;
+            cursor: pointer;
+            display: inline-block;
+            transition: 0.4s;
+        }
+        .logo-title:hover { color: var(--accent-color); transform: scale(1.02); }
+
+        .header-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border-color);
+            font-size: 0.75rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--text-muted);
+        }
+
+        nav.main-nav {
+            position: sticky;
+            top: 0;
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            z-index: 1000;
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            padding: 20px 0;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 40px;
+        }
+
+        .nav-link {
+            text-decoration: none;
+            color: var(--text-muted);
+            font-weight: 700;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            position: relative;
+            transition: 0.3s;
+        }
+        .nav-link:hover { color: var(--text-main); }
+        .nav-link.active { color: var(--accent-color); }
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: -21px;
+            left: 0;
+            width: 0%;
+            height: 3px;
+            background-color: var(--accent-color);
+            transition: 0.3s ease;
+        }
+        .nav-link.active::after { width: 100%; }
+
+        /* ==========================================================================
+           4. BARRA DE PESQUISA
+           ========================================================================== */
+        .search-section {
+            margin-bottom: 50px;
+            display: flex;
+            justify-content: center;
+        }
+        .search-box {
+            position: relative;
+            width: 100%;
+            max-width: 800px;
+        }
+        .search-input {
+            width: 100%;
+            padding: 20px 30px;
+            border-radius: 50px;
+            border: 2px solid var(--border-color);
+            background: var(--card-bg);
+            color: var(--text-main);
+            font-family: inherit;
+            font-size: 1.1rem;
+            font-weight: 500;
+            transition: 0.3s;
+        }
+        .search-input:focus {
+            border-color: var(--accent-color);
+            box-shadow: 0 10px 30px rgba(98, 0, 238, 0.1);
+        }
+        .search-btn {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: var(--text-main);
+            color: var(--bg-color);
+            border: none;
+            padding: 12px 30px;
+            border-radius: 40px;
+            font-weight: 800;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .search-btn:hover { background: var(--accent-color); color: white; }
+
+        /* ==========================================================================
+           5. LAYOUT PRINCIPAL E GRELHAS
+           ========================================================================== */
+        .page-view { display: none; animation: fadeIn 0.5s ease; }
+        .page-view.active { display: block; }
+
+        .section-header {
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            border-bottom: 2px solid var(--text-main);
+            padding-bottom: 10px;
+        }
+        .section-title { font-size: 1.8rem; font-weight: 900; letter-spacing: -0.5px; }
+        .section-subtitle { font-size: 0.75rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase; letter-spacing: 2px; }
+
+        /* Grid de Músicas (Radar/Biblioteca) */
+        .music-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 30px;
+        }
+
+        .music-card {
+            background: transparent;
+            cursor: pointer;
+            position: relative;
+            transition: 0.3s;
+            border-radius: var(--radius-md);
+        }
+        .music-card:hover { transform: translateY(-8px); }
+
+        .card-artwork {
+            position: relative;
+            aspect-ratio: 1/1;
+            border-radius: var(--radius-md);
+            overflow: hidden;
+            margin-bottom: 15px;
+            background: var(--border-color);
+            box-shadow: var(--shadow-sm);
+        }
+        .card-artwork img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: 0.5s;
+        }
+        .music-card:hover .card-artwork img { transform: scale(1.05); filter: brightness(0.8); }
+
+        /* Botão de Favorito Overlay */
+        .btn-fav-overlay {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(5px);
+            border: none;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            color: var(--text-main);
+            cursor: pointer;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: 0.3s;
+            z-index: 10;
+        }
+        .music-card:hover .btn-fav-overlay { opacity: 1; transform: translateY(0); }
+        .btn-fav-overlay.is-fav { opacity: 1; color: var(--danger-color); transform: translateY(0); }
+        .btn-fav-overlay:hover { transform: scale(1.1) !important; }
+
+        /* Ícone Play Overlay */
+        .play-overlay {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: 0.3s;
+            pointer-events: none;
+        }
+        .music-card:hover .play-overlay { opacity: 1; }
+        .play-overlay-icon {
+            width: 50px;
+            height: 50px;
+            background: var(--accent-color);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            transform: scale(0.8);
+            transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .music-card:hover .play-overlay-icon { transform: scale(1); }
+
+        .card-info h4 {
+            font-size: 1rem;
+            font-weight: 800;
+            margin-bottom: 4px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .card-info p {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text-muted);
+        }
+
+        /* ==========================================================================
+           6. VISTA DE CHARTS (TOP 50 ANALYTICS)
+           ========================================================================== */
+        .analytics-container {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 40px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .chart-row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            gap: 20px;
+            opacity: 0;
+            animation: fadeIn 0.5s ease forwards;
+        }
+
+        .chart-rank {
+            width: 40px;
+            font-family: 'Playfair Display', serif;
+            font-size: 1.5rem;
+            font-weight: 900;
+            color: var(--text-muted);
+            text-align: center;
+        }
+
+        .chart-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid var(--border-color);
+        }
+
+        .chart-artist-name {
+            width: 150px;
+            font-weight: 800;
+            font-size: 1rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .chart-bar-wrapper {
+            flex-grow: 1;
+            height: 20px;
+            background: var(--border-color);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .chart-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent-color), #9c27b0);
+            width: 0%; /* Animado via JS */
+            border-radius: 10px;
+            transition: width 1.5s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        .chart-stats {
+            min-width: 120px;
+            text-align: right;
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--text-muted);
+        }
+
+        /* ==========================================================================
+           7. VISTA DE NOTÍCIAS (GEMINI AI)
+           ========================================================================== */
+        .news-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+            align-items: stretch;
+        }
+
+        @media (min-width: 1200px) {
+            .news-grid { grid-template-columns: repeat(3, 1fr); }
+        }
+
+        .news-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            overflow: hidden;
+            transition: 0.25s;
+            display: flex;
+            flex-direction: column;
+            cursor: pointer;
+            text-align: left;
+        }
+        .news-card:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-lg);
+            border-color: var(--accent-color);
+        }
+
+        .news-img-placeholder {
+            height: 140px;
+            min-height: 120px;
+            background-color: #1a1a1a;
+            background-image: linear-gradient(135deg, var(--accent-color), #1a1a2e);
+            background-size: cover;
+            transition: background-image 0.4s ease-in-out, background-color 0.3s ease;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            position: relative;
+            padding: 12px 12px 14px;
+            box-sizing: border-box;
+            overflow: hidden;
+        }
+        .news-img-placeholder.has-thumb {
+            background-image: none;
+        }
+        .news-thumb-img {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0;
+            transition: opacity 0.45s ease-in-out;
+            z-index: 0;
+        }
+        .news-thumb-img.news-thumb-loaded {
+            opacity: 1;
+        }
+        .news-img-overlay {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-end;
+            pointer-events: none;
+        }
+        .news-source-watermark {
+            font-size: 0.68rem;
+            font-weight: 800;
+            letter-spacing: 0.08em;
+            color: rgba(255,255,255,0.95);
+            text-transform: uppercase;
+            text-align: center;
+            line-height: 1.35;
+            max-height: 2.8em;
+            overflow: hidden;
+            width: 100%;
+            text-shadow: 0 1px 8px rgba(0,0,0,0.75);
+        }
+        .news-tag {
+            position: absolute;
+            top: 12px;
+            left: 12px;
+            z-index: 2;
+            background: var(--accent-color);
+            color: white;
+            padding: 4px 10px;
+            font-size: 0.65rem;
+            font-weight: 900;
+            border-radius: 4px;
+            text-transform: uppercase;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.35);
+        }
+
+        .news-content { padding: 18px 20px; flex-grow: 1; display: flex; flex-direction: column; }
+        .news-title { font-family: 'Playfair Display', serif; font-size: 1.15rem; margin-bottom: 8px; line-height: 1.35; }
+        .news-excerpt { font-size: 0.88rem; color: var(--text-muted); margin-bottom: 12px; flex-grow: 1; line-height: 1.55; }
+        .news-footer { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; font-size: 0.72rem; font-weight: 700; color: var(--text-muted); border-top: 1px solid var(--border-color); padding: 12px 20px; }
+        .news-link-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.68rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: var(--accent-color);
+        }
+
+        .news-card-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            padding: 0 20px 16px;
+            margin-top: auto;
+        }
+        .btn-news-read,
+        .btn-news-source {
+            flex: 1;
+            min-width: 120px;
+            padding: 10px 14px;
+            border-radius: 8px;
+            font-size: 0.7rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            cursor: pointer;
+            border: 2px solid var(--accent-color);
+            transition: 0.2s;
+        }
+        .btn-news-read {
+            background: var(--accent-color);
+            color: white;
+        }
+        .btn-news-read:hover { filter: brightness(1.08); }
+        .btn-news-source {
+            background: transparent;
+            color: var(--accent-color);
+        }
+        .btn-news-source:hover { background: var(--accent-color); color: white; }
+
+        /* Leitor interno (artigo longo) */
+        .news-reader-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 3200;
+            background: rgba(0,0,0,0.55);
+            backdrop-filter: blur(6px);
+            display: flex;
+            align-items: stretch;
+            justify-content: center;
+            padding: 24px;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.35s ease, visibility 0.35s;
+        }
+        .news-reader-overlay.is-open {
+            opacity: 1;
+            visibility: visible;
+        }
+        .news-reader-panel {
+            width: 100%;
+            max-width: 720px;
+            max-height: 92vh;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-lg);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        .news-reader-head {
+            padding: 20px 24px 12px;
+            border-bottom: 1px solid var(--border-color);
+            flex-shrink: 0;
+        }
+        .news-reader-head h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.45rem;
+            line-height: 1.25;
+            margin: 0 0 8px;
+        }
+        .news-reader-meta {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+        }
+        .news-reader-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px 24px 28px;
+            -webkit-overflow-scrolling: touch;
+        }
+        #news-read-content {
+            font-size: 0.95rem;
+            line-height: 1.75;
+            color: var(--text-main);
+            white-space: pre-wrap;
+        }
+        .news-reader-foot {
+            padding: 14px 24px 18px;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            justify-content: flex-end;
+            flex-shrink: 0;
+        }
+        .btn-close-news-reader {
+            padding: 10px 20px;
+            border-radius: 8px;
+            border: 2px solid var(--border-color);
+            background: var(--bg-color);
+            font-weight: 800;
+            font-size: 0.75rem;
+            cursor: pointer;
+            text-transform: uppercase;
+        }
+        .btn-news-reader-source {
+            padding: 10px 20px;
+            border-radius: 8px;
+            border: none;
+            background: var(--accent-color);
+            color: white;
+            font-weight: 800;
+            font-size: 0.75rem;
+            cursor: pointer;
+            text-transform: uppercase;
+        }
+
+        /* ==========================================================================
+           8. HISTÓRICO LATERAL E WIDGETS
+           ========================================================================== */
+        .layout-with-sidebar {
+            display: grid;
+            grid-template-columns: 1fr 350px;
+            gap: 50px;
+        }
+
+        .sidebar-widget {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 25px;
+            margin-bottom: 30px;
+        }
+        .widget-title {
+            font-size: 0.8rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .widget-title::before { content: ''; display: inline-block; width: 8px; height: 8px; background: var(--accent-color); border-radius: 50%; }
+
+        .history-list { display: flex; flex-direction: column; gap: 15px; }
+        .history-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            cursor: pointer;
+            padding: 10px;
+            border-radius: 8px;
+            transition: 0.2s;
+        }
+        .history-item:hover { background: var(--border-color); }
+        .history-item img { width: 45px; height: 45px; border-radius: 6px; object-fit: cover; }
+        .history-info h6 { font-size: 0.85rem; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 180px; }
+        .history-info p { font-size: 0.7rem; color: var(--text-muted); }
+
+        /* ==========================================================================
+           9. BARRA DE REPRODUÇÃO (PLAYER UI)
+           ========================================================================== */
+        .player-wrapper {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: var(--player-height);
+            background: var(--glass-bg);
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
+            border-top: 1px solid var(--border-color);
+            display: grid;
+            grid-template-columns: 300px 1fr 300px;
+            align-items: center;
+            padding: 0 30px;
+            z-index: 2000;
+            transform: translateY(100%);
+            transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+        .player-wrapper.active { transform: translateY(0); }
+
+        /* Esquerda: Info da Faixa */
+        .player-track-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            cursor: pointer; /* Clicar abre lyrics */
+        }
+        .player-art { width: 60px; height: 60px; border-radius: 8px; object-fit: cover; box-shadow: var(--shadow-sm); }
+        .player-meta h5 { font-size: 0.95rem; font-weight: 800; margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 200px; }
+        .player-meta p { font-size: 0.75rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; }
+
+        /* Centro: Controlos e Progresso */
+        .player-center {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+        .player-controls-main {
+            display: flex;
+            align-items: center;
+            gap: 25px;
+        }
+        .ctrl-btn {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .ctrl-btn:hover { color: var(--text-main); transform: scale(1.1); }
+        .ctrl-play {
+            width: 40px;
+            height: 40px;
+            background: var(--text-main);
+            color: var(--bg-color);
+            border-radius: 50%;
+            font-size: 1rem;
+        }
+        .ctrl-play:hover { background: var(--accent-color); color: white; transform: scale(1.05); }
+
+        .player-progress-area {
+            width: 100%;
+            max-width: 600px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .time-display { font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; color: var(--text-muted); min-width: 45px; text-align: center; }
+        .progress-rail {
+            flex-grow: 1;
+            height: 6px;
+            background: var(--border-color);
+            border-radius: 3px;
+            position: relative;
+            cursor: pointer;
+        }
+        .progress-fill {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            background: var(--accent-color);
+            border-radius: 3px;
+            width: 0%;
+            pointer-events: none;
+        }
+        .progress-rail:hover .progress-fill { background: var(--accent-hover); }
+
+        /* Direita: Volume e Extras */
+        .player-right {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            gap: 20px;
+        }
+        .vol-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .vol-slider {
+            width: 100px;
+            height: 4px;
+            -webkit-appearance: none;
+            background: var(--border-color);
+            border-radius: 2px;
+            outline: none;
+            cursor: pointer;
+        }
+        .vol-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--text-main);
+            cursor: pointer;
+        }
+
+        /* ==========================================================================
+           10. LYRICS OVERLAY (MODAL)
+           ========================================================================== */
+        .lyrics-overlay {
+            position: fixed;
+            inset: 0;
+            background: var(--bg-color);
+            z-index: 3000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+            text-align: center;
+            transform: translateY(100%);
+            transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+        .lyrics-overlay.is-open,
+        .lyrics-overlay.active { transform: translateY(0); }
+        
+        .btn-close-lyrics {
+            position: absolute;
+            top: 40px;
+            right: 40px;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-main);
+            transition: 0.3s;
+        }
+        .btn-close-lyrics:hover { background: var(--text-main); color: var(--bg-color); }
+
+        .lyrics-art {
+            width: 150px;
+            height: 150px;
+            border-radius: 20px;
+            object-fit: cover;
+            margin-bottom: 30px;
+            box-shadow: var(--shadow-lg);
+            animation: pulse 4s infinite;
+        }
+        .lyrics-title { font-family: 'Playfair Display', serif; font-size: 3.5rem; font-weight: 900; margin-bottom: 10px; line-height: 1.1; }
+        .lyrics-artist { font-size: 1.2rem; font-weight: 700; color: var(--accent-color); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 40px; }
+        .lyrics-text { font-size: 1.5rem; line-height: 2; color: var(--text-muted); max-width: 800px; font-weight: 500; }
+
+        /* ==========================================================================
+           11. UTILITÁRIOS E ESTADOS
+           ========================================================================== */
+        .hidden { display: none !important; }
+        
+        .state-container {
+            grid-column: 1 / -1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 100px 20px;
+            text-align: center;
+        }
+        .loader-spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid var(--border-color);
+            border-top-color: var(--accent-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+        .state-text { font-weight: 800; text-transform: uppercase; letter-spacing: 2px; font-size: 0.8rem; color: var(--text-muted); }
+
+        .btn-outline {
+            background: transparent;
+            border: 2px solid var(--accent-color);
+            color: var(--accent-color);
+            padding: 10px 25px;
+            border-radius: 30px;
+            font-weight: 800;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: 0.3s;
+            text-transform: uppercase;
+        }
+        .btn-outline:hover { background: var(--accent-color); color: white; }
+
+        /* ==========================================================================
+           12. SKELETON LOADING (PERFORMANCE OPTIMIZATION)
+           ========================================================================== */
+        .skeleton-card {
+            background: var(--card-bg);
+            border-radius: var(--radius-md);
+            overflow: hidden;
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+        .skeleton-artwork {
+            aspect-ratio: 1/1;
+            background: linear-gradient(90deg, var(--border-color) 25%, #e8e8e8 50%, var(--border-color) 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+        }
+        .skeleton-text {
+            height: 14px;
+            margin: 12px 0 8px 15px;
+            border-radius: 4px;
+            background: linear-gradient(90deg, var(--border-color) 25%, #e8e8e8 50%, var(--border-color) 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+            width: 70%;
+        }
+        .skeleton-text.short {
+            width: 40%;
+            margin-bottom: 20px;
+        }
+        [data-theme="dark"] .skeleton-artwork,
+        [data-theme="dark"] .skeleton-text {
+            background: linear-gradient(90deg, #1a1a1a 25%, #2a2a2a 50%, #1a1a1a 75%);
+            background-size: 200% 100%;
+        }
+        @keyframes shimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+        .skeleton-chart {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 20px;
+            padding: 10px;
+        }
+        .skeleton-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(90deg, var(--border-color) 25%, #e8e8e8 50%, var(--border-color) 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+        }
+        .skeleton-bar {
+            flex-grow: 1;
+            height: 20px;
+            border-radius: 10px;
+            background: linear-gradient(90deg, var(--border-color) 25%, #e8e8e8 50%, var(--border-color) 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+        }
+        .skeleton-news {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            overflow: hidden;
+        }
+        .skeleton-news-img {
+            height: 180px;
+            background: linear-gradient(90deg, var(--border-color) 25%, #e8e8e8 50%, var(--border-color) 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+        }
+        .skeleton-news-content { padding: 25px; }
+        .skeleton-news-title {
+            height: 20px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+            background: linear-gradient(90deg, var(--border-color) 25%, #e8e8e8 50%, var(--border-color) 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+            width: 90%;
+        }
+        .skeleton-news-text {
+            height: 14px;
+            border-radius: 4px;
+            background: linear-gradient(90deg, var(--border-color) 25%, #e8e8e8 50%, var(--border-color) 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+            width: 100%;
+        }
+
+        /* Responsividade */
+        @media (max-width: 1024px) {
+            .layout-with-sidebar { grid-template-columns: 1fr; }
+            aside { display: none; }
+        }
+        @media (max-width: 768px) {
+            .player-wrapper { grid-template-columns: 1fr; padding: 15px; height: auto; gap: 15px; }
+            .player-track-info, .player-right { display: none; } /* Simplifica no mobile */
+            .logo-title { font-size: 3rem; }
+            nav.main-nav { gap: 15px; overflow-x: auto; justify-content: flex-start; padding: 15px; }
+            .nav-link { white-space: nowrap; }
+        }
+
+    </style>
+</head>
+<body>
+
+    <!-- ==========================================
+         CABEÇALHO
+         ========================================== -->
+    <div class="container">
+        <header>
+            <button class="theme-toggle-btn" onclick="app.toggleTheme()">
+                <span id="theme-icon">🌙</span> Modo Escuro
+            </button>
+            <h1 class="logo-title" onclick="app.navigate('news')">KOVR SPACE</h1>
+            <div class="header-meta">
+                <span id="current-date">A carregar data...</span>
+                <span style="color: var(--accent-color);">AUDIO ANALYTICS & AI NEWS</span>
+            </div>
+        </header>
+
+        <section class="search-section">
+            <div class="search-box">
+                <input type="text" id="search-input" class="search-input" placeholder="Pesquisar faixas, artistas ou álbuns..." onkeypress="app.handleSearchInput(event)">
+                <button class="search-btn" onclick="app.executeSearch()">EXPLORAR</button>
+            </div>
+        </section>
+
+        <nav class="main-nav">
+            <a onclick="app.navigate('news', this)" id="nav-news" class="nav-link active">Journal AI</a>
+            <a onclick="app.navigate('home', this)" id="nav-home" class="nav-link">Radar (Home)</a>
+            <a onclick="app.navigate('charts', this)" id="nav-charts" class="nav-link">Top 50 Fãs</a>
+            <a onclick="app.navigate('library', this)" id="nav-library" class="nav-link">Favoritos</a>
+        </nav>
+
+        <!-- ==========================================
+             VISTAS (VIEWS)
+             ========================================== -->
+        
+        <!-- VISTA: HOME (RADAR) -->
+        <main id="view-home" class="page-view">
+            <div class="layout-with-sidebar">
+                <section>
+                    <div class="section-header">
+                        <div>
+                            <h2 class="section-title">Radar de Tendências</h2>
+                            <p class="section-subtitle" id="home-subtitle">Top Tracks Globais</p>
+                        </div>
+                    </div>
+                    
+                    <div id="home-content" class="music-grid">
+                        <!-- Tracks injectadas aqui -->
+                    </div>
+                </section>
+
+                <aside>
+                    <div class="sidebar-widget">
+                        <h4 class="widget-title">A tua Atividade</h4>
+                        <div id="history-list" class="history-list">
+                            <!-- Histórico injectado aqui -->
+                            <p style="font-size: 0.8rem; color: var(--text-muted);">Nenhuma faixa reproduzida nesta sessão.</p>
+                        </div>
+                    </div>
+
+                    <div class="sidebar-widget" style="background: var(--accent-color); color: white; border: none;">
+                        <h4 class="widget-title" style="color: white;">Música Central Pro</h4>
+                        <p style="font-size: 0.85rem; margin-bottom: 20px; opacity: 0.9;">Desbloqueia áudio Lossless e métricas avançadas na nossa plataforma premium.</p>
+                        <button style="background: white; color: var(--accent-color); border: none; padding: 10px 20px; border-radius: 20px; font-weight: 800; cursor: pointer; width: 100%;">SABER MAIS</button>
+                    </div>
+                </aside>
+            </div>
+        </main>
+
+        <!-- VISTA: CHARTS (TOP 50) -->
+        <main id="view-charts" class="page-view">
+            <div class="section-header">
+                <div>
+                    <h2 class="section-title">Análise de Popularidade</h2>
+                    <p class="section-subtitle">Top 50 Artistas por volume de Fãs (Deezer Data)</p>
+                </div>
+            </div>
+            
+            <div class="analytics-container" id="charts-content">
+                <!-- Gráficos de barras injectados aqui -->
+            </div>
+        </main>
+
+        <!-- VISTA: NEWS (GEMINI AI) -->
+        <main id="view-news" class="page-view active">
+            <div class="section-header">
+                <div>
+                    <h2 class="section-title">Notícias do Mundo Real</h2>
+                    <p class="section-subtitle">Catálogo com Leitor Interno · artigos longos via <code style="font-size:0.85em;">news-catalog.json</code> (servir com HTTP local)</p>
+                </div>
+            </div>
+
+            <div id="news-content" class="news-grid">
+                <!-- Cartões de notícias injectados aqui -->
+            </div>
+        </main>
+
+        <!-- VISTA: LIBRARY (FAVORITOS) -->
+        <main id="view-library" class="page-view">
+            <div class="section-header">
+                <div>
+                    <h2 class="section-title">A Minha Coleção</h2>
+                    <p class="section-subtitle" id="lib-count">0 Faixas Guardadas</p>
+                </div>
+            </div>
+
+            <div id="library-content" class="music-grid">
+                <!-- Favoritos injectados aqui -->
+            </div>
+        </main>
+    </div>
+
+    <!-- ==========================================
+         ELEMENTOS FLUTUANTES (PLAYER & LYRICS)
+         ========================================== -->
+
+    <!-- Elemento Audio Oculto -->
+    <audio id="audio-engine" preload="metadata"></audio>
+
+    <!-- Player Bar -->
+    <div id="player-wrapper" class="player-wrapper">
+        <div class="player-track-info" onclick="app.toggleLyricsModal()" title="Ver Letras">
+            <img id="p-art" src="" alt="Album Art" class="player-art">
+            <div class="player-meta">
+                <h5 id="p-title">Nenhuma Faixa</h5>
+                <p id="p-artist">---</p>
+            </div>
+        </div>
+
+        <div class="player-center">
+            <div class="player-controls-main">
+                <button class="ctrl-btn" onclick="app.prevTrack()" title="Anterior">⏮</button>
+                <button class="ctrl-btn ctrl-play" id="p-play-btn" onclick="app.togglePlayPause()">▶</button>
+                <button class="ctrl-btn" onclick="app.nextTrack()" title="Próxima">⏭</button>
+            </div>
+            <div class="player-progress-area">
+                <span class="time-display" id="p-current-time">0:00</span>
+                <div class="progress-rail" id="p-rail" onclick="app.seekTo(event)">
+                    <div class="progress-fill" id="p-fill"></div>
+                </div>
+                <span class="time-display" id="p-total-time">0:00</span>
+            </div>
+        </div>
+
+        <div class="player-right">
+            <button class="ctrl-btn" onclick="app.toggleLyricsModal()" title="Letras/Modo Foco">🎤</button>
+            <div class="vol-wrapper">
+                <span style="font-size: 0.9rem; color: var(--text-muted);">🔈</span>
+                <input type="range" class="vol-slider" id="p-volume" min="0" max="1" step="0.05" value="0.8" oninput="app.setVolume(this.value)">
+                <span style="font-size: 0.9rem; color: var(--text-muted);">🔊</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lyrics Modal -->
+    <div id="lyrics-overlay" class="lyrics-overlay">
+        <button class="btn-close-lyrics" onclick="app.toggleLyricsModal()">✕</button>
+        <img id="l-art" src="" alt="" class="lyrics-art">
+        <h2 id="l-title" class="lyrics-title">Título</h2>
+        <p id="l-artist" class="lyrics-artist">Artista</p>
+        <div class="lyrics-text">
+            <p>♪ Reproduzindo amostra de áudio (30s) ♪</p>
+            <p style="font-size: 1rem; opacity: 0.5; margin-top: 20px;">(As letras completas requerem uma subscrição Premium devido a direitos de autor)</p>
+        </div>
+    </div>
+
+    <!-- Leitor interno (full_content com \\n\\n → innerText) -->
+    <div id="news-reader-overlay" class="news-reader-overlay" aria-hidden="true" onclick="if(event.target===this) app.closeNewsReader()">
+        <div class="news-reader-panel" role="dialog" aria-labelledby="news-read-title" onclick="event.stopPropagation()">
+            <div class="news-reader-head">
+                <h2 id="news-read-title">Título</h2>
+                <div id="news-read-meta" class="news-reader-meta">Fonte · Data</div>
+            </div>
+            <div class="news-reader-body">
+                <div id="news-read-content"></div>
+            </div>
+            <div class="news-reader-foot">
+                <button type="button" class="btn-close-news-reader" onclick="app.closeNewsReader()">Fechar</button>
+                <button type="button" id="news-read-source-btn" class="btn-news-reader-source" onclick="app.openNewsReaderSource()">Ler fonte original</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==========================================
+         LÓGICA JAVASCRIPT (APP ARCHITECTURE)
+         ========================================== -->
+    <script>
+        /**
+         * Chave API do Gemini injetada pelo ambiente
+         */
+        const apiKey = ""; 
+
+        /** Catálogo pesado (full_content). Servir pasta via HTTP: python3 -m http.server */
+        const NEWS_CATALOG_URL = 'news-catalog.json';
+
+        /**
+         * Fallback curto se fetch falhar (file:// ou JSON em falta). [] = só JSON + Gemini.
+         */
+        const STATIC_MUSIC_NEWS_CATALOG = [];
+
+        /**
+         * Aplicação Principal - Música Central Pro
+         * Estruturada com padrão de Módulo Revealing simplificado
+         */
+        const app = (function() {
+            
+            // --- ESTADO DA APLICAÇÃO ---
+            const state = {
+                theme: localStorage.getItem('mc_theme') || 'light',
+                activeView: 'news',
+                currentQueue: [],
+                currentIndex: -1,
+                isPlaying: false,
+                favorites: JSON.parse(localStorage.getItem('mc_favs') || '[]'),
+                history: JSON.parse(localStorage.getItem('mc_history') || '[]'),
+                chartDataCache: null,
+                newsDataCache: null,
+                newsReaderArticleIndex: -1,
+                newsReaderSourceUrl: '',
+                isLyricsOpen: false,
+                searchDebounceTimer: null,
+                cache: {
+                    home: { data: null, timestamp: 0 },
+                    charts: { data: null, timestamp: 0 },
+                    news: { data: null, timestamp: 0 }
+                }
+            };
+
+            // Referências de DOM cruciais
+            let audioEl;
+            let playBtn;
+            let fillBar;
+
+            // Opcional: proxy próprio (ex. Cloudflare Worker em workers/deezer-proxy.js). Formato: base + url=ENCODED
+            const DEEZER_CUSTOM_PROXY_BASE = '';
+
+            // Proxies para contornar CORS na Deezer API
+            const CORS_PROXIES = [
+                'https://api.allorigins.win/get?url=',
+                'https://corsproxy.io/?'
+            ];
+
+            const CHART_ARTIST_CONCURRENCY = 12;
+
+            // --- INICIALIZAÇÃO ---
+            function init() {
+                console.log("Música Central Pro: Inicializando sistemas...");
+                
+                setupDate();
+                applyTheme();
+                
+                audioEl = document.getElementById('audio-engine');
+                playBtn = document.getElementById('p-play-btn');
+                fillBar = document.getElementById('p-fill');
+                
+                setupAudioListeners();
+                setupKeyboardShortcuts();
+                
+                // Vista inicial: notícias; radar pré-carrega em silêncio para quando mudares de separador
+                Promise.allSettled([
+                    loadNewsData(false),
+                    loadHomeData('top hits', true)
+                ]).then(() => {
+                    console.log("Feed de notícias e radar inicial prontos.");
+                });
+                
+                renderHistory();
+            }
+
+            // --- UTILITÁRIOS E UI BÁSICA ---
+            function setupDate() {
+                const opts = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+                document.getElementById('current-date').innerText = new Date().toLocaleDateString('pt-PT', opts).toUpperCase();
+            }
+
+            function toggleTheme() {
+                state.theme = state.theme === 'light' ? 'dark' : 'light';
+                localStorage.setItem('mc_theme', state.theme);
+                applyTheme();
+            }
+
+            function applyTheme() {
+                document.body.setAttribute('data-theme', state.theme);
+                document.getElementById('theme-icon').innerText = state.theme === 'light' ? '🌙' : '☀️';
+            }
+
+            function showLoader(containerId, message, type = 'grid') {
+                const container = document.getElementById(containerId);
+                let skeletonHTML = '';
+                
+                if (type === 'grid') {
+                    skeletonHTML = Array(12).fill(0).map(() => `
+                        <div class="skeleton-card">
+                            <div class="skeleton-artwork"></div>
+                            <div class="skeleton-text"></div>
+                            <div class="skeleton-text short"></div>
+                        </div>
+                    `).join('');
+                } else if (type === 'charts') {
+                    skeletonHTML = Array(10).fill(0).map(() => `
+                        <div class="skeleton-chart">
+                            <div class="skeleton-avatar"></div>
+                            <div class="skeleton-bar" style="width: 40%;"></div>
+                            <div class="skeleton-bar" style="width: 30%;"></div>
+                        </div>
+                    `).join('');
+                } else if (type === 'news') {
+                    skeletonHTML = Array(8).fill(0).map(() => `
+                        <div class="skeleton-news">
+                            <div class="skeleton-news-img"></div>
+                            <div class="skeleton-news-content">
+                                <div class="skeleton-news-title"></div>
+                                <div class="skeleton-news-text"></div>
+                                <div class="skeleton-news-text" style="width: 60%; margin-top: 10px;"></div>
+                            </div>
+                        </div>
+                    `).join('');
+                }
+                
+                container.innerHTML = `
+                    ${skeletonHTML}
+                    <div style="grid-column: 1/-1; text-align: center; padding: 20px;">
+                        <p class="state-text">${message}</p>
+                    </div>
+                `;
+            }
+
+            function showError(containerId, message, retryCallback) {
+                const container = document.getElementById(containerId);
+                container.innerHTML = `
+                    <div class="state-container">
+                        <p class="state-text" style="color: var(--danger-color); margin-bottom: 20px;">❌ ${message}</p>
+                        ${retryCallback ? `<button class="btn-outline" onclick="${retryCallback}">Tentar Novamente</button>` : ''}
+                    </div>
+                `;
+            }
+
+            // --- NAVEGAÇÃO E ROTAS ---
+            function navigate(viewId, navElement = null) {
+                if(state.activeView === viewId) return;
+                state.activeView = viewId;
+
+                // Esconder todas as vistas
+                document.querySelectorAll('.page-view').forEach(v => v.classList.remove('active'));
+                
+                // Mostrar a vista alvo
+                const targetView = document.getElementById(`view-${viewId}`);
+                if(targetView) targetView.classList.add('active');
+
+                // Atualizar Navegação
+                document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+                if(navElement) {
+                    navElement.classList.add('active');
+                } else {
+                    const fallbackLink = document.getElementById(`nav-${viewId}`);
+                    if(fallbackLink) fallbackLink.classList.add('active');
+                }
+
+                // Disparar lógica baseada na vista
+                switch(viewId) {
+                    case 'home':
+                        if(state.currentQueue.length === 0) loadHomeData('top hits');
+                        break;
+                    case 'charts':
+                        loadChartsData();
+                        break;
+                    case 'news':
+                        loadNewsData();
+                        break;
+                    case 'library':
+                        renderLibraryView();
+                        break;
+                }
+
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+
+            // --- CACHE SYSTEM (Stale-While-Revalidate) ---
+            const CACHE_DURATION = 5 * 60 * 1000; // 5 minutos (home, charts)
+            const NEWS_CACHE_DURATION = 30 * 60 * 1000; // 30 minutos — notícias mudam menos; reduz chamadas Gemini
+
+            function getFromCache(key, maxAgeMs = CACHE_DURATION) {
+                const cached = state.cache[key];
+                if (cached && cached.data && (Date.now() - cached.timestamp < maxAgeMs)) {
+                    return cached.data;
+                }
+                return null;
+            }
+
+            function setCache(key, data) {
+                state.cache[key] = { data, timestamp: Date.now() };
+            }
+
+            // --- COMUNICAÇÃO DE REDE (FETCH COM PRIORITY) ---
+            async function fetchWithProxy(endpoint, priority = 'low') {
+                const targetUrl = encodeURIComponent(`https://api.deezer.com/${endpoint}`);
+                const timeout = priority === 'high' ? 8000 : 12000;
+                const fetchOpts = {
+                    priority: priority === 'high' ? 'high' : 'auto'
+                };
+
+                async function tryFetch(url) {
+                    const controller = new AbortController();
+                    const timeoutId = setTimeout(() => controller.abort(), timeout);
+                    try {
+                        const response = await fetch(url, { ...fetchOpts, signal: controller.signal });
+                        clearTimeout(timeoutId);
+                        if (!response.ok) return null;
+                        const data = await response.json();
+                        return data.contents ? JSON.parse(data.contents) : data;
+                    } catch (e) {
+                        clearTimeout(timeoutId);
+                        throw e;
+                    }
+                }
+
+                if (DEEZER_CUSTOM_PROXY_BASE) {
+                    try {
+                        const json = await tryFetch(DEEZER_CUSTOM_PROXY_BASE + targetUrl);
+                        if (json) return json;
+                    } catch (e) {
+                        console.warn('Proxy Deezer personalizado falhou, a usar proxies públicos.', e);
+                    }
+                }
+
+                for (const proxy of CORS_PROXIES) {
+                    try {
+                        const json = await tryFetch(proxy + targetUrl);
+                        if (json) return json;
+                    } catch (e) {
+                        console.warn(`Falha no proxy ${proxy}, tentando o próximo...`);
+                    }
+                }
+                throw new Error("Todos os proxies falharam.");
+            }
+
+            /** Executa tarefas com limite de concorrência (evita 50 pedidos simultâneos aos proxies). */
+            async function mapWithConcurrency(items, limit, asyncFn) {
+                const results = new Array(items.length);
+                let nextIndex = 0;
+                async function worker() {
+                    while (true) {
+                        const i = nextIndex++;
+                        if (i >= items.length) break;
+                        results[i] = await asyncFn(items[i], i);
+                    }
+                }
+                const n = Math.min(limit, items.length) || 1;
+                await Promise.all(Array.from({ length: n }, () => worker()));
+                return results;
+            }
+
+            // --- LÓGICA DA VISTA: HOME (RADAR) ---
+            async function loadHomeData(query, silent = false) {
+                const cacheKey = `home_${query}`;
+                const cached = getFromCache(cacheKey);
+                
+                if (cached && silent) {
+                    state.currentQueue = cached;
+                    renderMusicGrid(state.currentQueue, 'home-content');
+                    return;
+                }
+                
+                if (!silent) {
+                    showLoader('home-content', 'Sincronizando Radar Global...', 'grid');
+                    document.getElementById('home-subtitle').innerText = `Resultados para: ${query.toUpperCase()}`;
+                }
+
+                try {
+                    const data = await fetchWithProxy(`search?q=${query}&limit=24`, 'high');
+                    if (data && data.data && data.data.length > 0) {
+                        state.currentQueue = data.data;
+                        setCache(cacheKey, data.data);
+                        renderMusicGrid(state.currentQueue, 'home-content');
+                    } else {
+                        showError('home-content', 'Nenhuma faixa encontrada.');
+                    }
+                } catch (error) {
+                    console.error(error);
+                    if (!silent) showError('home-content', 'Falha ao conectar aos servidores Deezer.', `app.executeSearch()`);
+                }
+            }
+
+            function handleSearchInput(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    clearTimeout(state.searchDebounceTimer);
+                    executeSearch();
+                } else {
+                    clearTimeout(state.searchDebounceTimer);
+                    state.searchDebounceTimer = setTimeout(() => {
+                        const val = document.getElementById('search-input').value.trim();
+                        if (val && val.length >= 2) {
+                            navigate('home');
+                            loadHomeData(val, false);
+                        }
+                    }, 300);
+                }
+            }
+
+            function executeSearch() {
+                const val = document.getElementById('search-input').value.trim();
+                if (val) {
+                    navigate('home');
+                    loadHomeData(val, false);
+                }
+            }
+
+            // --- LÓGICA DA VISTA: CHARTS (TOP 50) ---
+            async function loadChartsData(silent = false) {
+                const cached = getFromCache('charts');
+                
+                if (cached) {
+                    state.chartDataCache = cached;
+                    renderChartsView(state.chartDataCache);
+                    return;
+                }
+                
+                if (!silent) {
+                    showLoader('charts-content', 'Compilando dados de audiência global...', 'charts');
+                }
+
+                try {
+                    const res = await fetchWithProxy('chart/0/artists?limit=50', 'high');
+                    if (!res || !res.data) throw new Error("Sem dados");
+
+                    const artists = res.data;
+                    const detailedArtists = [];
+                    let partialShown = false;
+
+                    await mapWithConcurrency(artists, CHART_ARTIST_CONCURRENCY, async (a) => {
+                        let value;
+                        try {
+                            value = await fetchWithProxy(`artist/${a.id}`);
+                        } catch {
+                            return;
+                        }
+                        if (!value || value.error) return;
+                        detailedArtists.push(value);
+                        if (!partialShown && detailedArtists.length >= 5) {
+                            partialShown = true;
+                            renderChartsView([...detailedArtists], true);
+                        }
+                    });
+
+                    state.chartDataCache = detailedArtists;
+                    setCache('charts', detailedArtists);
+                    renderChartsView(state.chartDataCache, false);
+
+                } catch (error) {
+                    console.error(error);
+                    if (!silent) showError('charts-content', 'Erro ao carregar analítica.', "app.navigate('charts')");
+                }
+            }
+
+            function renderChartsView(artistsList, isPartial = false) {
+                const container = document.getElementById('charts-content');
+                if (!artistsList || artistsList.length === 0) return;
+
+                // Ordenar por Fãs
+                const sorted = [...artistsList].sort((a, b) => (b.nb_fan || 0) - (a.nb_fan || 0));
+                const maxFans = sorted[0].nb_fan || 1; // Previne divisão por 0
+
+                let html = '';
+                sorted.forEach((artist, i) => {
+                    const pct = ((artist.nb_fan || 0) / maxFans) * 100;
+                    const fansStr = Number(artist.nb_fan || 0).toLocaleString('pt-PT');
+                    
+                    html += `
+                        <div class="chart-row" style="animation-delay: ${isPartial ? 0 : i * 0.05}s">
+                            <div class="chart-rank">#${i + 1}</div>
+                            <img src="${artist.picture_medium}" class="chart-avatar" alt="${artist.name}">
+                            <div class="chart-artist-name" title="${artist.name}">${artist.name}</div>
+                            <div class="chart-bar-wrapper">
+                                <div class="chart-bar-fill" style="width: ${pct}%"></div>
+                            </div>
+                            <div class="chart-stats">${fansStr} Fãs</div>
+                        </div>
+                    `;
+                });
+
+                if (isPartial) {
+                    html += `<div style="text-align:center; padding:20px; color:var(--text-muted); font-size:0.8rem;">A processar o restante ranking...</div>`;
+                }
+
+                container.innerHTML = html;
+            }
+
+            function escapeHtml(str) {
+                if (str == null) return '';
+                return String(str)
+                    .replace(/&/g, '&amp;')
+                    .replace(/</g, '&lt;')
+                    .replace(/>/g, '&gt;')
+                    .replace(/"/g, '&quot;');
+            }
+
+            function safeArticleUrl(u) {
+                if (!u || typeof u !== 'string') return null;
+                try {
+                    const x = new URL(u.trim());
+                    if (x.protocol === 'http:' || x.protocol === 'https:') return x.href;
+                } catch (e) { /* ignorar */ }
+                return null;
+            }
+
+            /** Apenas CDN Unsplash para thumbnails. */
+            function safeImageUrl(u) {
+                if (!u || typeof u !== 'string') return null;
+                try {
+                    const x = new URL(u.trim());
+                    if (x.protocol !== 'https:') return null;
+                    const h = x.hostname.toLowerCase();
+                    if (h === 'images.unsplash.com' || h === 'plus.unsplash.com') return x.href;
+                } catch (e) { /* ignorar */ }
+                return null;
+            }
+
+            function extractModelJsonText(text) {
+                if (typeof text !== 'string') return '{}';
+                let t = text.trim();
+                const fenced = t.match(/```(?:json)?\s*([\s\S]*?)```/);
+                if (fenced) t = fenced[1].trim();
+                return t;
+            }
+
+            // --- LÓGICA DA VISTA: NOTÍCIAS (JSON → ESTÁTICO → CACHE → GEMINI) ---
+            async function loadNewsData(silent = false) {
+                const cached = getFromCache('news', NEWS_CACHE_DURATION);
+                if (cached && cached.length) {
+                    state.newsDataCache = cached;
+                    renderNewsView(cached);
+                    return;
+                }
+
+                if (!silent) {
+                    showLoader('news-content', 'A carregar catálogo editorial…', 'news');
+                }
+
+                try {
+                    const res = await fetch(NEWS_CATALOG_URL, { cache: 'no-store' });
+                    if (res.ok) {
+                        const data = await res.json();
+                        let list = Array.isArray(data.news) ? data.news : [];
+                        list = list.filter(function (n) { return n && typeof n.title === 'string' && n.title.trim(); }).slice(0, 10);
+                        if (list.length > 0) {
+                            state.newsDataCache = list;
+                            setCache('news', list);
+                            renderNewsView(list);
+                            return;
+                        }
+                    }
+                } catch (err) {
+                    console.warn('news-catalog.json indisponível (usa servidor HTTP local):', err);
+                }
+
+                if (typeof STATIC_MUSIC_NEWS_CATALOG !== 'undefined' && Array.isArray(STATIC_MUSIC_NEWS_CATALOG) && STATIC_MUSIC_NEWS_CATALOG.length > 0) {
+                    const list = STATIC_MUSIC_NEWS_CATALOG.slice(0, 10);
+                    state.newsDataCache = list;
+                    setCache('news', list);
+                    renderNewsView(list);
+                    return;
+                }
+
+                if (!silent) {
+                    showLoader('news-content', 'A recolher notícias na web (Gemini)…', 'news');
+                }
+
+                const prompt = `É Abril de 2026. Usa pesquisa na web e lista exatamente 10 notícias REAIS, distintas e recentes sobre música (indústria, concertos, álbuns, streaming, tecnologia áudio, artistas).
+
+Regras:
+- Cada entrada deve corresponder a uma peça ou comunicado que consigas localizar online.
+- Inclui o campo "url" com o link https completo da página da notícia quando o encontrares; se não houver URL fiável, usa "" (string vazia). Nunca inventes domínios ou caminhos.
+- "title", "source" e "date" devem ser fiéis às fontes encontradas.
+- "excerpt": duas frases em Português de Portugal, factuais, sem sensacionalismo.
+- "tag": uma palavra ou duas (ex.: TOUR, ÁLBUM, MERCADO, FESTIVAL).
+
+Responde APENAS com JSON válido neste formato, sem markdown à volta:
+{"news":[{"tag":"","title":"","excerpt":"","source":"","date":"","url":""}, ... ]}`;
+
+                try {
+                    const payload = {
+                        contents: [{ parts: [{ text: prompt }] }],
+                        tools: [{ "google_search": {} }],
+                        generationConfig: { 
+                            responseMimeType: "application/json",
+                            temperature: 0.25
+                        }
+                    };
+
+                    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+
+                    if (!response.ok) throw new Error("Erro de API Gemini");
+
+                    const data = await response.json();
+                    const rawText = data.candidates[0].content.parts[0].text;
+                    const jsonString = extractModelJsonText(rawText);
+                    const parsedData = JSON.parse(jsonString);
+                    let list = Array.isArray(parsedData.news) ? parsedData.news : [];
+                    list = list.filter(function (n) {
+                        return n && typeof n.title === 'string' && n.title.trim().length > 0;
+                    }).slice(0, 10);
+
+                    if (list.length === 0) throw new Error("Lista de notícias vazia");
+
+                    state.newsDataCache = list;
+                    setCache('news', list);
+                    renderNewsView(list);
+
+                } catch (error) {
+                    console.error("Gemini Error:", error);
+                    if (!silent) showError('news-content', 'Falha ao gerar o Journal AI. Tente novamente.', "app.navigate('news')");
+                }
+            }
+
+            function renderNewsView(newsArray) {
+                const container = document.getElementById('news-content');
+                if (!newsArray || !Array.isArray(newsArray)) return;
+
+                container.innerHTML = newsArray.map(function (n, idx) {
+                    const sourceShort = (n.source || 'Imprensa').slice(0, 52);
+                    const imgSrc = safeImageUrl(n.image);
+                    const imgAttr = imgSrc ? (' src="' + escapeHtml(imgSrc) + '"') : '';
+                    const imgEl = imgSrc
+                        ? ('<img class="news-thumb-img" alt="" loading="lazy" decoding="async"' + imgAttr + ' onload="this.classList.add(\'news-thumb-loaded\')">')
+                        : '';
+                    return (
+                        '<article class="news-card">' +
+                        '<div class="news-img-placeholder' + (imgSrc ? ' has-thumb' : '') + '">' +
+                        imgEl +
+                        '<span class="news-tag">' + escapeHtml(n.tag || 'Música') + '</span>' +
+                        '<div class="news-img-overlay">' +
+                        '<span class="news-source-watermark">' + escapeHtml(sourceShort) + '</span>' +
+                        '</div>' +
+                        '</div>' +
+                        '<div class="news-content">' +
+                        '<h3 class="news-title">' + escapeHtml(n.title) + '</h3>' +
+                        '<p class="news-excerpt">' + escapeHtml(n.excerpt || '') + '</p>' +
+                        '</div>' +
+                        '<div class="news-footer">' +
+                        '<span>' + escapeHtml((n.source || '').toUpperCase()) + '</span>' +
+                        '<span>' + escapeHtml(n.date || '') + '</span>' +
+                        '</div>' +
+                        '<div class="news-card-actions">' +
+                        '<button type="button" class="btn-news-read" onclick="event.stopPropagation(); app.openNewsReader(' + idx + ')">Leitor interno</button>' +
+                        '<button type="button" class="btn-news-source" onclick="event.stopPropagation(); app.openExternalNewsUrl(' + idx + ')">Fonte original</button>' +
+                        '</div>' +
+                        '</article>'
+                    );
+                }).join('');
+            }
+
+            function openNewsReader(articleIndex) {
+                const list = state.newsDataCache;
+                if (!list || articleIndex < 0 || articleIndex >= list.length) return;
+                const n = list[articleIndex];
+                state.newsReaderArticleIndex = articleIndex;
+                const portal = safeArticleUrl(n.url);
+                state.newsReaderSourceUrl = portal || '';
+                document.getElementById('news-read-title').textContent = n.title || '';
+                document.getElementById('news-read-meta').textContent = ((n.source || '') + ' · ' + (n.date || '')).trim();
+                const bodyEl = document.getElementById('news-read-content');
+                const longText = (n.full_content && String(n.full_content).trim()) ? n.full_content : '';
+                bodyEl.innerText = longText || (n.excerpt || 'Texto completo não disponível para esta notícia.');
+                const srcBtn = document.getElementById('news-read-source-btn');
+                srcBtn.style.display = portal ? 'inline-block' : 'none';
+                const overlay = document.getElementById('news-reader-overlay');
+                overlay.classList.add('is-open');
+                overlay.setAttribute('aria-hidden', 'false');
+            }
+
+            function closeNewsReader() {
+                const overlay = document.getElementById('news-reader-overlay');
+                overlay.classList.remove('is-open');
+                overlay.setAttribute('aria-hidden', 'true');
+                state.newsReaderArticleIndex = -1;
+                state.newsReaderSourceUrl = '';
+            }
+
+            function openNewsReaderSource() {
+                const u = state.newsReaderSourceUrl;
+                if (u) window.open(u, '_blank', 'noopener,noreferrer');
+            }
+
+            function openExternalNewsUrl(articleIndex) {
+                const list = state.newsDataCache;
+                if (!list || articleIndex < 0 || articleIndex >= list.length) return;
+                const n = list[articleIndex];
+                const portal = safeArticleUrl(n.url);
+                const q = encodeURIComponent(((n.title || '') + ' ' + (n.source || '')).trim());
+                const href = portal || ('https://www.google.com/search?q=' + q);
+                window.open(href, '_blank', 'noopener,noreferrer');
+            }
+
+            // --- LÓGICA DA VISTA: BIBLIOTECA (FAVORITOS) ---
+            function renderLibraryView() {
+                const container = document.getElementById('library-content');
+                const countLabel = document.getElementById('lib-count');
+                
+                countLabel.innerText = `${state.favorites.length} Faixas Guardadas`;
+
+                if (state.favorites.length === 0) {
+                    showError('library-content', 'A tua coleção está vazia. Adiciona faixas usando o botão de coração.');
+                    return;
+                }
+
+                // Para tocar a partir da biblioteca, a queue passa a ser os favoritos
+                state.currentQueue = [...state.favorites]; 
+                renderMusicGrid(state.currentQueue, 'library-content');
+            }
+
+            function toggleFavoriteAction(e, trackId) {
+                e.stopPropagation(); // Impede o clique de disparar o play da música
+
+                // Encontra a faixa completa na queue atual ou nos favoritos
+                const track = state.currentQueue.find(t => t.id === trackId) || state.favorites.find(t => t.id === trackId);
+                if(!track) return;
+
+                const favIndex = state.favorites.findIndex(f => f.id === trackId);
+
+                if (favIndex > -1) {
+                    // Remover
+                    state.favorites.splice(favIndex, 1);
+                } else {
+                    // Adicionar
+                    state.favorites.push(track);
+                }
+
+                // Salvar
+                localStorage.setItem('mc_favs', JSON.stringify(state.favorites));
+
+                // Re-renderizar
+                if (state.activeView === 'home') renderMusicGrid(state.currentQueue, 'home-content');
+                if (state.activeView === 'library') renderLibraryView();
+            }
+
+            // --- RENDERIZADOR PARTILHADO (MUSIC GRID) ---
+            function renderMusicGrid(trackArray, containerId) {
+                const container = document.getElementById(containerId);
+                
+                container.innerHTML = trackArray.map((t, idx) => {
+                    const isFav = state.favorites.some(f => f.id === t.id);
+                    const coverUrl = t.album ? t.album.cover_medium : (t.cover_medium || 'https://via.placeholder.com/250');
+                    const priority = idx < 4 ? 'high' : 'lazy';
+                    
+                    return `
+                        <div class="music-card" onclick="app.playTrackFromQueue(${idx})">
+                            <div class="card-artwork">
+                                <img src="${coverUrl}" alt="${t.title}" ${priority === 'high' ? 'fetchpriority="high"' : 'loading="lazy"'} decoding="async">
+                                <div class="play-overlay"><div class="play-overlay-icon">▶</div></div>
+                                <button class="btn-fav-overlay ${isFav ? 'is-fav' : ''}" onclick="app.toggleFavoriteAction(event, ${t.id})" title="Favorito">
+                                    ${isFav ? '❤️' : '♡'}
+                                </button>
+                            </div>
+                            <div class="card-info">
+                                <h4>${t.title}</h4>
+                                <p>${t.artist.name}</p>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }
+
+            // --- SISTEMA DE REPRODUÇÃO (AUDIO ENGINE) ---
+            function setupAudioListeners() {
+                // Atualização de tempo
+                audioEl.addEventListener('timeupdate', () => {
+                    if(!audioEl.duration) return;
+                    const pct = (audioEl.currentTime / audioEl.duration) * 100;
+                    fillBar.style.width = `${pct}%`;
+                    document.getElementById('p-current-time').innerText = formatTime(audioEl.currentTime);
+                });
+
+                // Carregamento de metadata (duração total)
+                audioEl.addEventListener('loadedmetadata', () => {
+                    document.getElementById('p-total-time').innerText = formatTime(audioEl.duration);
+                });
+
+                // Fim da faixa
+                audioEl.addEventListener('ended', () => {
+                    nextTrackLogic();
+                });
+
+                // Atualizar estado UI
+                audioEl.addEventListener('play', () => {
+                    state.isPlaying = true;
+                    playBtn.innerText = '||';
+                });
+                audioEl.addEventListener('pause', () => {
+                    state.isPlaying = false;
+                    playBtn.innerText = '▶';
+                });
+            }
+
+            function setupKeyboardShortcuts() {
+                window.addEventListener('keydown', (e) => {
+                    // Evitar trigger se estiver a escrever na caixa de pesquisa
+                    if(document.activeElement.tagName === 'INPUT') return;
+                    
+                    if (e.code === 'Space') {
+                        e.preventDefault();
+                        togglePlayPauseLogic();
+                    }
+                });
+            }
+
+            function playTrackFromQueue(index) {
+                if (index < 0 || index >= state.currentQueue.length) return;
+                
+                const track = state.currentQueue[index];
+                if (!track.preview) {
+                    alert("Amostra de áudio não disponível para esta faixa.");
+                    return;
+                }
+
+                state.currentIndex = index;
+                
+                // Preparar Audio
+                audioEl.src = track.preview;
+                audioEl.play();
+
+                // Atualizar UI do Player
+                const cover = track.album ? track.album.cover_small : track.cover_small;
+                document.getElementById('p-art').src = cover;
+                document.getElementById('p-title').innerText = track.title;
+                document.getElementById('p-artist').innerText = track.artist.name;
+                document.getElementById('player-wrapper').classList.add('active');
+
+                // Atualizar Lyrics se estiverem abertas
+                if (state.isLyricsOpen) populateLyricsModal();
+
+                // Registar Histórico
+                registerHistory(track);
+            }
+
+            function togglePlayPauseLogic() {
+                if (state.currentIndex === -1) return; // Nada selecionado
+                if (audioEl.paused) audioEl.play();
+                else audioEl.pause();
+            }
+
+            function nextTrackLogic() {
+                if (state.currentIndex < state.currentQueue.length - 1) {
+                    playTrackFromQueue(state.currentIndex + 1);
+                }
+            }
+
+            function prevTrackLogic() {
+                if (audioEl.currentTime > 3) {
+                    // Se já tocou mais de 3s, volta ao início da mesma faixa
+                    audioEl.currentTime = 0;
+                } else if (state.currentIndex > 0) {
+                    // Volta à faixa anterior
+                    playTrackFromQueue(state.currentIndex - 1);
+                }
+            }
+
+            function seekToLogic(e) {
+                if(state.currentIndex === -1 || !audioEl.duration) return;
+                const rail = document.getElementById('p-rail');
+                const rect = rail.getBoundingClientRect();
+                const pct = (e.clientX - rect.left) / rect.width;
+                audioEl.currentTime = pct * audioEl.duration;
+            }
+
+            function setVolumeLogic(val) {
+                audioEl.volume = parseFloat(val);
+            }
+
+            function formatTime(seconds) {
+                if (isNaN(seconds)) return "0:00";
+                const m = Math.floor(seconds / 60);
+                const s = Math.floor(seconds % 60);
+                return `${m}:${s < 10 ? '0' : ''}${s}`;
+            }
+
+            // --- HISTÓRICO ---
+            function registerHistory(track) {
+                const cover = track.album ? track.album.cover_small : track.cover_small;
+                const entry = { id: track.id, title: track.title, artist: track.artist.name, cover: cover };
+                
+                // Remover se já existir (para colocar no topo)
+                state.history = state.history.filter(h => h.id !== entry.id);
+                // Adicionar no início (max 6)
+                state.history.unshift(entry);
+                if (state.history.length > 6) state.history.pop();
+
+                localStorage.setItem('mc_history', JSON.stringify(state.history));
+                renderHistory();
+            }
+
+            function renderHistory() {
+                const container = document.getElementById('history-list');
+                if (state.history.length === 0) return;
+
+                container.innerHTML = state.history.map(h => `
+                    <div class="history-item">
+                        <img src="${h.cover}" alt="Capa">
+                        <div class="history-info">
+                            <h6>${h.title}</h6>
+                            <p>${h.artist}</p>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            // --- LYRICS MODAL ---
+            function toggleLyricsModalLogic() {
+                const modal = document.getElementById('lyrics-overlay');
+                state.isLyricsOpen = !state.isLyricsOpen;
+                
+                if (state.isLyricsOpen) {
+                    modal.classList.add('active');
+                    populateLyricsModal();
+                } else {
+                    modal.classList.remove('active');
+                }
+            }
+
+            function populateLyricsModal() {
+                if (state.currentIndex === -1) return;
+                const track = state.currentQueue[state.currentIndex];
+                const cover = track.album ? track.album.cover_big : track.cover_big;
+                
+                document.getElementById('l-art').src = cover;
+                document.getElementById('l-title').innerText = track.title;
+                document.getElementById('l-artist').innerText = track.artist.name;
+            }
+
+            // --- RETORNO PÚBLICO (API DO OBJETO APP) ---
+            return {
+                init,
+                toggleTheme,
+                navigate,
+                handleSearchInput,
+                executeSearch,
+                toggleFavoriteAction,
+                playTrackFromQueue,
+                togglePlayPause: togglePlayPauseLogic, // <--- ERRO CORRIGIDO AQUI!
+                nextTrack: nextTrackLogic,
+                prevTrack: prevTrackLogic,
+                seekTo: seekToLogic,
+                setVolume: setVolumeLogic,
+                toggleLyricsModal: toggleLyricsModalLogic,
+                openNewsReader,
+                closeNewsReader,
+                openNewsReaderSource,
+                openExternalNewsUrl
+            };
+
+        })(); // Fim do módulo `app`
+
+        // Arrancar aplicação
+        app.init();
+
+    </script>
+</body>
+</html>
