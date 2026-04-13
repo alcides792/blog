@@ -6,6 +6,7 @@
     <title>Música Central Pro | Premium Audio Experience</title>
     
     <!-- PRECONNECT para Priorização de Recursos -->
+    <link rel="preconnect" href="https://cdn.vercel-insights.com">
     <link rel="preconnect" href="https://api.deezer.com">
     <link rel="preconnect" href="https://api.allorigins.win">
     <link rel="preconnect" href="https://api.rss2json.com">
@@ -2092,10 +2093,7 @@ Responde APENAS com JSON válido neste formato, sem markdown à volta:
 
     </script>
 
-    <!-- Vercel Analytics -->
-    <script type="module">
-        import { inject } from 'https://esm.sh/@vercel/analytics';
-        inject();
-    </script>
+    <!-- Vercel Web Analytics -->
+    <script defer src="https://cdn.vercel-insights.com/v1/script.js"></script>
 </body>
 </html>
