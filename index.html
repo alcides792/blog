@@ -2136,14 +2136,23 @@ Responde APENAS com JSON válido neste formato, sem markdown à volta:
     })(document, window);
 /* ]]> */
 </script>
-    
 <script data-cfasync="false" type="text/javascript" id="clever-core">
 /* <![CDATA[ */
     (function (document, window) {
+        // 1. Limpa o localStorage e cookies da Clever para evitar o bloqueio de frequência
+        try {
+            for (let key in localStorage) {
+                if (key.includes('clever')) localStorage.removeItem(key);
+            }
+        } catch (e) {}
+
         var a, c = document.createElement("script"), f = window.frameElement;
 
         c.id = "CleverCoreLoader102715";
-        c.src = "https://scripts.cleverwebserver.com/7fc362cd1411c34e4be2dbd96affa91a.js";
+        
+        // 2. Adicionamos um "Cache Buster" (o Date.now()) no final da URL
+        // Isso engana o navegador, fazendo-o pensar que é um arquivo novo a cada refresh
+        c.src = "https://scripts.cleverwebserver.com/7fc362cd1411c34e4be2dbd96affa91a.js?v=" + Date.now();
 
         c.async = !0;
         c.type = "text/javascript";
